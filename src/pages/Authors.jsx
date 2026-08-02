@@ -1,11 +1,7 @@
-import { blogServices } from "@/services/api"
-import { useQuery } from "@tanstack/react-query"
+import { useAuthors } from "@/hooks/useBlogData";
 
 export default function Authors() {
-    const { data: authors, isLoading, isError } = useQuery({
-        queryKey: ["authors"],
-        queryFn: blogServices.getAuthors,
-    })
+    const { data: authors, isLoading, isError } = useAuthors();
 
     if (isLoading) return <div className="text-center p-8 text-zinc-500">Loading creators...</div>;
     if (isError) return <div className="text-center p-8 text-red-500 font-medium">Failed to load authors.</div>;

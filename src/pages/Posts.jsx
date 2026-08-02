@@ -1,15 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
-import { blogServices } from "../services/api";
+import { useAuthors, usePosts } from "@/hooks/useBlogData";
 
 export default function Posts() {
-    const { data: posts, isLoading, isError, error } = useQuery({
-        queryKey: ["posts"],
-        queryFn: blogServices.getPosts,
-    })
+    const { data: posts, postsLoading, isError, error } = usePosts();
+    const { data: authors, isLoading: authorsLoading } = useAuthors();
+
+    const isLoading = postsLoading || authorsLoading;
 
     if (isLoading) return <div className="text-center p-8 text-zinc-500">Loading posts...</div>;
     if (isError) return <div className="text-center p-8 text-red-500 font-medium">{error.message || "Failed to load posts"}</div>;
     
+    const getAuthorName = (authorId) => {
+        if (!authors) return "Unknown Author";
+        const author = authors.find((a) => a.id === authorId);
+        return author ? author.username : "Unknown Author";
+    };
+
     return (
         
         <div className="space-y-6">
@@ -32,8 +37,8 @@ export default function Posts() {
                     <p className="text-zinc-600 dark:text-zinc-400 line-clamp-3 mb-4 text-sm leading-relaxed">
                         {post.details}
                     </p>
-                    <div className="text-xs text-zinc-400">
-                        By Author ID: {post.authorId || "Unknown"} 
+                    <div className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                        by <span className="text-blue-600 dark:text-blue-400">{getAuthorName(post.authorId)}</span>
                     </div>
                     </article>
                 ))}

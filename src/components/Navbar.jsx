@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const location = useLocation();
+  const userProfile = JSON.parse(localStorage.getItem("user_profile"));
   
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
@@ -30,16 +31,30 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Posts", href: "/posts" },
     { name: "Authors", href: "/authors" },
-    { name: "About", href: "/about" },
+    { name: "About", href: "/about" },  
+    { name: "Login", href: "/login"},
+    { name: "Profile", href: "/profile"}
   ];
+
+  const filteredNavLink = navLinks.filter((link) => {
+    if(link.name === "Authors" && userProfile?.role !== "admin") {
+      return false;
+    }
+    if(link.name === "Login" && userProfile) {
+      return false;
+    }
+    if(link.name === "Profile" && !userProfile) {
+      return false;
+    }
+    return true;
+  })
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80 transition-colors duration-300">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
 
-        {/* Navigation Routes */}
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => {
+          {filteredNavLink.map((link) => {
             const isActive = location.pathname === link.href;
             return (
               <Link
@@ -57,9 +72,7 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Interactive Controls */}
         <div className="flex items-center gap-2">
-          {/* Theme Toggling Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -74,7 +87,6 @@ export default function Navbar() {
             )}
           </Button>
 
-          {/* Simple Mobile Menu Button Wrapper (Optional styling shortcut) */}
           <div className="md:hidden">
             <Button variant="outline" size="sm" className="text-xs">
               Menu
